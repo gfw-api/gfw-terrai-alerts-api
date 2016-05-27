@@ -1,0 +1,40 @@
+{
+    "id": "#(service.id)",
+    "name": "#(service.name)",
+    "urls": [{
+        "url": "/terrai-alerts/admin/:iso",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts/admin/:iso"
+        }]
+    }, {
+        "url": "/terrai-alerts/admin/:iso/:id1",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts/admin/:iso/:id1"
+        }]
+    }, {
+        "url": "/terrai-alerts/use/:name/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts/use/:name/:id"
+        }]
+    }, {
+        "url": "/terrai-alerts/wdpa/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts/wdpa/:id"
+        }]
+    }, {
+        "url": "/terrai-alerts",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts"
+        }]
+    }]
+}

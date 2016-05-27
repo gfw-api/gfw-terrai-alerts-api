@@ -1,0 +1,8 @@
+{
+    "logger": {
+        "name": "gfw-terrai-alerts-api",
+        "level": "info",
+        "toFile": false,
+        "dirLogFile": null
+    }
+}

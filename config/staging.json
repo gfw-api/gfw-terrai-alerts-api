@@ -1,0 +1,11 @@
+{
+    "logger": {
+        "name": "gfw-terrai-alerts-api-STAGING",
+        "level": "debug",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "port": null
+    }
+}

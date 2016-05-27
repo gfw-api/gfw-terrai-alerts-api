@@ -1,0 +1,17 @@
+{
+    "logger": {
+        "name": "gfw-terrai-alerts-api-DEV",
+        "level": "debug",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "id": "gfw-terrai-alerts-api_1.0.0",
+        "name": "GFW Fires API",
+        "port": 3600
+    },
+    "cartoDB":{
+        "apiKey": null,
+        "user": null
+    }
+}
