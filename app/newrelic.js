@@ -8,7 +8,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['GFW Viirs Fires API'],
+  app_name: ['GFW Terrai Alerts API'],
   /**
    * Your New Relic license key.
    */
