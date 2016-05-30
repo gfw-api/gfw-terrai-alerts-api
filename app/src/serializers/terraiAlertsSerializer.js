@@ -3,11 +3,13 @@
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 var terraiAlertsSerializer = new JSONAPISerializer('terrai-alerts', {
-    attributes: ['value', 'period'],
+    attributes: ['value', 'period', 'min_date', 'max_date','downloadUrls'],
     typeForAttribute: function (attribute, record) {
         return attribute;
     },
-    keyForAttribute: 'camelCase'
+    downloadUrls:{
+        attributes: ['csv', 'geojson', 'kml', 'shp', 'svg']
+    }
 });
 
 class TerraiAlertsSerializer {
