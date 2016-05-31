@@ -36,5 +36,12 @@
             "method": "GET",
             "path": "/api/v1/terrai-alerts"
         }]
+    }, {
+        "url": "/terrai-alerts/latest",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/terrai-alerts/latest"
+        }]
     }]
 }

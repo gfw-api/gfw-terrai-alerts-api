@@ -75,6 +75,12 @@ class TerraiAlertsRouter {
 
     }
 
+    static * latest() {
+        logger.info('Obtaining latest data');
+        let data = yield CartoDBService.latest(this.query.limit);
+        this.body = TerraiAlertsSerializer.serializeLatest(data);
+    }
+
 }
 
 var isCached = function*(next) {
@@ -91,6 +97,7 @@ router.get('/admin/:iso/:id1', isCached, TerraiAlertsRouter.getSubnational);
 router.get('/use/:name/:id', isCached, TerraiAlertsRouter.use);
 router.get('/wdpa/:id', isCached, TerraiAlertsRouter.wdpa);
 router.get('/', isCached, TerraiAlertsRouter.world);
+router.get('/latest', isCached, TerraiAlertsRouter.latest);
 
 
 module.exports = router;

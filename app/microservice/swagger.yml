@@ -233,6 +233,35 @@ paths:
           schema:
             $ref: '#/definitions/Errors'
 
+  /terrai-alerts/latest:
+    get:
+      operationId: getLatest
+      produces:
+        - application/vnd.api+json
+      tags:
+        - TERRAI
+      parameters:
+        - name: limit
+          in: query
+          description: Limit. Default 3
+          type: integer
+      responses:
+        200:
+          description: Results obtained
+          schema:
+            $ref: '#/definitions/TERRAILATESTAPI'
+        404:
+          description: Geostore not found
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
 
 definitions:
   Errors:
@@ -283,6 +312,36 @@ definitions:
       meta:
         type: object
         description: A meta object containing non-standard meta-information about the error.
+
+  TERRAILATESTAPI:
+    type: object
+    properties:
+      data:
+        properties:
+          $schema:
+            $ref: '#/definitions/TERRAILATESTBody'
+  TERRAILATESTBody:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Resource type
+      id:
+        type: string
+        description: Resource id
+      attributes:
+        properties:
+          schema:
+            $ref: '#/definitions/TERRAILATESTModel'
+
+  TERRAILATESTModel:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+      grid-code:
+        type: number
 
   TERRAIALERTSAPI:
     type: object

@@ -10,8 +10,8 @@ var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const WORLD = `SELECT COUNT(f.*) AS value
             {{additionalSelect}}
         FROM latin_decrease_current_points f
-        WHERE date >= '{{begin}}'
-              AND date <= '{{end}}'
+        WHERE date >= '{{begin}}'::date
+              AND date <= '{{end}}'::date
               AND ST_INTERSECTS(
                 ST_SetSRID(
                   ST_GeomFromGeoJSON('{{{geojson}}}'), 4326), f.the_geom)`;
@@ -20,8 +20,8 @@ const ISO = `SELECT COUNT(f.*) AS value
             {{additionalSelect}}
         FROM latin_decrease_current_points f
         WHERE iso = UPPER('{{iso}}')
-            AND date >= '{{begin}}'
-            AND date <= '{{end}}' `;
+            AND date >= '{{begin}}'::date
+            AND date <= '{{end}}'::date `;
 
 const ID1 = `WITH p as (SELECT st_simplify (the_geom, 0.0001) as the_geom FROM gadm2_provinces_simple
             WHERE iso = UPPER('{{iso}}') AND id_1 = {{id1}} LIMIT 1)
@@ -29,16 +29,16 @@ const ID1 = `WITH p as (SELECT st_simplify (the_geom, 0.0001) as the_geom FROM g
             {{additionalSelect}}
         FROM latin_decrease_current_points f,p
         WHERE ST_Intersects(f.the_geom, p.the_geom)
-            AND date >= '{{begin}}'
-            AND date <= '{{end}}' `;
+            AND date >= '{{begin}}'::date
+            AND date <= '{{end}}'::date `;
 
 const USE = `SELECT COUNT(f.*) AS value
             {{additionalSelect}}
         FROM {{useTable}} u, latin_decrease_current_points f
         WHERE u.cartodb_id = {{pid}}
               AND ST_Intersects(f.the_geom, u.the_geom)
-              AND date >= '{{begin}}'
-              AND date <= '{{end}}' `;
+              AND date >= '{{begin}}'::date
+              AND date <= '{{end}}'::date `;
 
 const WDPA = `WITH p as (SELECT CASE when marine::numeric = 2 then null
         when ST_NPoints(the_geom)<=18000 THEN the_geom
@@ -49,8 +49,17 @@ const WDPA = `WITH p as (SELECT CASE when marine::numeric = 2 then null
             {{additionalSelect}}
         FROM latin_decrease_current_points f, p
         WHERE ST_Intersects(f.the_geom, p.the_geom)
-              AND date >= '{{begin}}'
-              AND date <= '{{end}}'  `;
+              AND date >= '{{begin}}'::date
+              AND date <= '{{end}}'::date  `;
+
+const LATEST = `SELECT DISTINCT
+            grid_code,
+            date
+        FROM latin_decrease_current_points
+        WHERE grid_code IS NOT NULL
+        GROUP BY grid_code, date
+        ORDER BY grid_code DESC
+        LIMIT {{limit}}`;
 
 const MIN_MAX_DATE_SQL = ', MIN(date) as min_date, MAX(date) as max_date ';
 
@@ -99,18 +108,18 @@ class CartoDBService {
     }
 
     getDownloadUrls(query, params) {
-        try{
+        try {
             let formats = ['csv', 'geojson', 'kml', 'shp', 'svg'];
             let download = {};
             let queryFinal = Mustache.render(query, params);
             queryFinal = queryFinal.replace(MIN_MAX_DATE_SQL, '');
             queryFinal = queryFinal.replace('SELECT COUNT(pt.*) AS value', 'SELECT pt.*');
             queryFinal = encodeURIComponent(queryFinal);
-            for(let i=0, length = formats.length; i < length; i++){
+            for (let i = 0, length = formats.length; i < length; i++) {
                 download[formats[i]] = this.apiUrl + '?q=' + queryFinal + '&format=' + formats[i];
             }
             return download;
-        }catch(err){
+        } catch (err) {
             logger.error(err);
         }
     }
@@ -139,7 +148,7 @@ class CartoDBService {
             begin: periods[0],
             end: periods[1]
         };
-        if(alertQuery){
+        if (alertQuery) {
             params.additionalSelect = MIN_MAX_DATE_SQL;
         }
         let data = yield executeThunk(this.client, ISO, params);
@@ -161,7 +170,7 @@ class CartoDBService {
             begin: periods[0],
             end: periods[1]
         };
-        if(alertQuery){
+        if (alertQuery) {
             params.additionalSelect = MIN_MAX_DATE_SQL;
         }
         let data = yield executeThunk(this.client, ID1, params);
@@ -183,7 +192,7 @@ class CartoDBService {
             begin: periods[0],
             end: periods[1]
         };
-        if(alertQuery){
+        if (alertQuery) {
             params.additionalSelect = MIN_MAX_DATE_SQL;
         }
         let data = yield executeThunk(this.client, USE, params);
@@ -205,7 +214,7 @@ class CartoDBService {
             begin: periods[0],
             end: periods[1]
         };
-        if(alertQuery){
+        if (alertQuery) {
             params.additionalSelect = MIN_MAX_DATE_SQL;
         }
         let data = yield executeThunk(this.client, WDPA, params);
@@ -245,7 +254,7 @@ class CartoDBService {
                 begin: periods[0],
                 end: periods[1]
             };
-            if(alertQuery){
+            if (alertQuery) {
                 params.additionalSelect = MIN_MAX_DATE_SQL;
             }
             let data = yield executeThunk(this.client, WORLD, params);
@@ -258,6 +267,20 @@ class CartoDBService {
             return null;
         }
         throw new NotFound('Geostore not found');
+    }
+
+    * latest(limit = 3) {
+        logger.debug('Obtaining latest with limit %s', limit);
+        let params = {
+            limit: limit
+        };
+        let data = yield executeThunk(this.client, LATEST, params);
+        logger.debug('data', data);
+        if (data.rows) {
+            let result = data.rows;
+            return result;
+        }
+        return null;
     }
 
 }
