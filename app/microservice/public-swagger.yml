@@ -315,7 +315,7 @@ definitions:
     properties:
       data:
         properties:
-          $schema:
+          schema:
             $ref: '#/definitions/TERRAILATESTBody'
   TERRAILATESTBody:
     type: object
@@ -345,7 +345,7 @@ definitions:
     properties:
       data:
         properties:
-          $schema:
+          schema:
             $ref: '#/definitions/TERRAIALERTSBody'
 
   TERRAIALERTSBody:
