@@ -16,41 +16,45 @@ const WORLD = `SELECT COUNT(f.*) AS value
                 ST_SetSRID(
                   ST_GeomFromGeoJSON('{{{geojson}}}'), 4326), f.the_geom)`;
 
-const ISO = `SELECT COUNT(f.*) AS value
+const ISO = ` with area as (select area_ha from gadm2_countries_simple WHERE iso = UPPER('{{iso}}'))
+        SELECT COUNT(f.*) AS value, area_ha
             {{additionalSelect}}
-        FROM latin_decrease_current_points f
+        FROM latin_decrease_current_points f, area
         WHERE iso = UPPER('{{iso}}')
             AND date >= '{{begin}}'::date
-            AND date <= '{{end}}'::date `;
+            AND date <= '{{end}}'::date
+         group by area_ha `;
 
-const ID1 = `WITH p as (SELECT st_simplify (the_geom, 0.0001) as the_geom FROM gadm2_provinces_simple
+const ID1 = `WITH p as (SELECT st_simplify (the_geom, 0.0001) as the_geom, area_ha FROM gadm2_provinces_simple
             WHERE iso = UPPER('{{iso}}') AND id_1 = {{id1}} LIMIT 1)
-        SELECT COUNT(f.*) AS value
+        SELECT COUNT(f.*) AS value, area_ha
             {{additionalSelect}}
-        FROM latin_decrease_current_points f,p
-        WHERE ST_Intersects(f.the_geom, p.the_geom)
-            AND date >= '{{begin}}'::date
-            AND date <= '{{end}}'::date `;
+        FROM latin_decrease_current_points f right join p
+        on ST_Intersects(f.the_geom, p.the_geom) 
+        AND date >= '{{begin}}'::date
+        AND date <= '{{end}}'::date
+        group by area_ha `;
 
-const USE = `SELECT COUNT(f.*) AS value
-            {{additionalSelect}}
-        FROM {{useTable}} u, latin_decrease_current_points f
+const USE = `SELECT COUNT(f.*) AS value, area_ha
+        {{additionalSelect}}
+        FROM {{useTable}} u left join  latin_decrease_current_points f  on ST_Intersects(f.the_geom, u.the_geom)
+         AND date >= '{{begin}}'::date
+         AND date <= '{{end}}'::date
         WHERE u.cartodb_id = {{pid}}
-              AND ST_Intersects(f.the_geom, u.the_geom)
-              AND date >= '{{begin}}'::date
-              AND date <= '{{end}}'::date `;
+        group by area_ha `;
 
 const WDPA = `WITH p as (SELECT CASE when marine::numeric = 2 then null
         when ST_NPoints(the_geom)<=18000 THEN the_geom
        WHEN ST_NPoints(the_geom) BETWEEN 18000 AND 50000 THEN ST_RemoveRepeatedPoints(the_geom, 0.001)
       ELSE ST_RemoveRepeatedPoints(the_geom, 0.005)
-       END as the_geom FROM wdpa_protected_areas where wdpaid={{wdpaid}})
-        SELECT COUNT(f.*) AS value
-            {{additionalSelect}}
-        FROM latin_decrease_current_points f, p
-        WHERE ST_Intersects(f.the_geom, p.the_geom)
-              AND date >= '{{begin}}'::date
-              AND date <= '{{end}}'::date  `;
+       END as the_geom, gis_area*100 as area_ha FROM wdpa_protected_areas where wdpaid={{wdpaid}})
+        SELECT COUNT(f.*) AS value, area_ha
+
+        FROM latin_decrease_current_points f right join p
+        on ST_Intersects(f.the_geom, p.the_geom)
+        AND date >= '{{begin}}'::date
+        AND date <= '{{end}}'::date
+        group by area_ha  `;
 
 const LATEST = `SELECT DISTINCT
             grid_code,
@@ -76,7 +80,7 @@ var executeThunk = function(client, sql, params) {
 
 var deserializer = function(obj) {
     return function(callback) {
-        new JSONAPIDeserializer().deserialize(obj, callback);
+        new JSONAPIDeserializer({keyForAttribute: 'camelCase'}).deserialize(obj, callback);
     };
 };
 
@@ -262,6 +266,7 @@ class CartoDBService {
                 let result = data.rows[0];
                 result.period = this.getPeriodText(period);
                 result.downloadUrls = this.getDownloadUrls(WORLD, params);
+                result.area_ha = geostore.areaHa;
                 return result;
             }
             return null;

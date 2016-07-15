@@ -3,13 +3,14 @@
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 var terraiAlertsSerializer = new JSONAPISerializer('terrai-alerts', {
-    attributes: ['value', 'period', 'min_date', 'max_date', 'downloadUrls'],
+    attributes: ['value', 'period', 'min_date', 'max_date', 'downloadUrls', 'area_ha'],
     typeForAttribute: function(attribute, record) {
         return attribute;
     },
     downloadUrls: {
         attributes: ['csv', 'geojson', 'kml', 'shp', 'svg']
-    }
+    },
+    keyForAttribute: 'camelCase'
 });
 
 var terraiAlertsLatestSerializer = new JSONAPISerializer('terrai-latest', {
