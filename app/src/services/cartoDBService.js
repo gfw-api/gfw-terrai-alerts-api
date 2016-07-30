@@ -30,7 +30,7 @@ const ID1 = `WITH p as (SELECT st_simplify (the_geom, 0.0001) as the_geom, area_
         SELECT COUNT(f.*) AS value, area_ha
             {{additionalSelect}}
         FROM latin_decrease_current_points f right join p
-        on ST_Intersects(f.the_geom, p.the_geom) 
+        on ST_Intersects(f.the_geom, p.the_geom)
         AND date >= '{{begin}}'::date
         AND date <= '{{end}}'::date
         group by area_ha `;
@@ -233,7 +233,7 @@ class CartoDBService {
 
     * getGeostore(hashGeoStore) {
         logger.debug('Obtaining geostore with hash %s', hashGeoStore);
-        let result = yield require('microservice-client').requestToMicroservice({
+        let result = yield require('vizz.microservice-client').requestToMicroservice({
             uri: '/geostore/' + hashGeoStore,
             method: 'GET',
             json: true
