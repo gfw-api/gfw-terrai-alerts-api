@@ -1,7 +1,19 @@
 swagger: '2.0'
 info:
   title: GFW Terrai Alerts API
-  description: Global Forest Watch - Terrai Alerts API
+  description: |
+    ## Global Forest Watch - Terrai Alerts API
+
+    Identifies areas of likely tree cover loss
+
+    | Property | Value |
+    | --- | --- | --- |
+    | Coverage | Latin America |
+    | Resolution | 250 x 250 meters (MODIS)" |
+    | Source | CIAT |
+    | Timescale | January 2004-present |
+    | Units | Alerts |
+    | Updates | Monthly |
   version: "1.0.0"
 host: example.vizzuality.com
 
