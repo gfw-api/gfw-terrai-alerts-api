@@ -1,4 +1,4 @@
-# GFW Fires API
+# GFW Terrai alerts API
 
 
 This repository is the microservice that it implement the terrai alerts funcionality and exposed the /terrai-alerts endpoints in the api-gateway
