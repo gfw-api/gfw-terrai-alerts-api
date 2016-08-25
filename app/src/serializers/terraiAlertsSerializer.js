@@ -26,7 +26,8 @@ var terraiAlertsLatestSerializer = new JSONAPISerializer('terrai-latest', {
     },
     counts:{
         attributes: years
-    }
+    },
+    keyForAttribute: 'camelCase'
 });
 
 class TerraiAlertsSerializer {
