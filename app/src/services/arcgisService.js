@@ -154,39 +154,27 @@ class ArcgisService {
 
     static formatCountsLatest(counts) {
         let results = {};
-        let prevValue = null;
-        let newValue = null;
-        let origDate = new Date(Date.UTC(START_YEAR, 0, 1));
+        let year = null;
+        let newValue = new Date(Date.UTC(START_YEAR, 0, 1));
         for (let i = 1, length = counts.length; i < length; i++) {
-            newValue = new Date(origDate.getTime() + ((i - 1) * 16 * 24*60*60*1000));
-            let prevYear = null;
-            let newYear = newValue.getFullYear();
-            if(prevValue){
-                prevYear = prevValue.getFullYear();
-                let dayOfYear = ArcgisService.getYearDay(newValue);
-                if(dayOfYear < 16){
-                    for(let i = 0, length = (16 - dayOfYear); i < length; i++){
-                        if(!results[prevYear]){
-                            results[prevYear] = [];
-                        }
-                        results[prevYear].push(0);
-                    }
-                }
-                if(!results[newYear]){
-                    results[newYear] = [];
-                }
-                for(let i = 0; i < dayOfYear - 1; i++){
-                    results[newYear].push(0);
-                }
-                results[newYear].push(counts[i]);
 
-            } else {
-                if(!results[newYear]){
-                    results[newYear] = [];
-                }
-                results[newYear].push(counts[i]);
+            if(i > 1){
+                newValue = new Date(newValue.getTime() + 24*60*60*1000);
             }
-            prevValue = newValue;
+            year = newValue.getFullYear();
+            if(!results[year]){
+                results[year] = [];
+            }
+            results[year].push(counts[i]);
+            for(let j = 0; j < 15; j++){
+                newValue = new Date(newValue.getTime() + 24*60*60*1000);
+                year = newValue.getFullYear();
+                if(!results[year]){
+                    results[year] = [];
+                }
+                results[year].push(0);
+            }
+
         }
         return results;
     }
