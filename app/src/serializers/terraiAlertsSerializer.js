@@ -13,10 +13,19 @@ var terraiAlertsSerializer = new JSONAPISerializer('terrai-alerts', {
     keyForAttribute: 'camelCase'
 });
 
+let years = [];
+let maxYear = new Date().getFullYear();
+for(let i = 2004; i <= maxYear; i++ ){
+    years.push(i + '');
+}
+
 var terraiAlertsLatestSerializer = new JSONAPISerializer('terrai-latest', {
-    attributes: ['grid_code', 'date'],
+    attributes: ['minDate', 'maxDate', 'counts'],
     typeForAttribute: function(attribute, record) {
         return attribute;
+    },
+    counts:{
+        attributes: years
     }
 });
 

@@ -3,6 +3,7 @@
 var Router = require('koa-router');
 var logger = require('logger');
 var CartoDBService = require('services/cartoDBService');
+var ArcgisService = require('services/arcgisService');
 var NotFound = require('errors/notFound');
 var TerraiAlertsSerializer = require('serializers/terraiAlertsSerializer');
 
@@ -77,7 +78,7 @@ class TerraiAlertsRouter {
 
     static * latest() {
         logger.info('Obtaining latest data');
-        let data = yield CartoDBService.latest(this.query.limit);
+        let data = yield ArcgisService.getFullHistogram();
         this.body = TerraiAlertsSerializer.serializeLatest(data);
     }
 
