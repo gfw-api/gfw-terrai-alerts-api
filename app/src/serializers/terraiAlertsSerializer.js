@@ -3,7 +3,7 @@
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 var terraiAlertsSerializer = new JSONAPISerializer('terrai-alerts', {
-    attributes: ['value', 'period', 'min_date', 'max_date', 'downloadUrls', 'area_ha'],
+    attributes: ['value', 'period', 'minDate', 'maxDate', 'downloadUrls', 'areaHa'],
     typeForAttribute: function(attribute, record) {
         return attribute;
     },

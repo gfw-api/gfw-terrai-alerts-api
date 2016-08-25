@@ -12,6 +12,30 @@ var router = new Router({
     prefix: '/terrai-alerts'
 });
 
+let getToday = function() {
+    let today = new Date();
+    return `${today.getFullYear().toString()}-${(today.getMonth()+1).toString()}-${today.getDate().toString()}`;
+};
+
+let getYesterday = function() {
+    let yesterday = new Date(Date.now() - (24 * 60 * 60 * 1000));
+    return `${yesterday.getFullYear().toString()}-${(yesterday.getMonth()+1).toString()}-${yesterday.getDate().toString()}`;
+};
+
+let defaultDate = function() {
+    let to = getToday();
+    let from = getYesterday();
+    return from + ',' + to;
+};
+
+let getDates = function(period) {
+    let dates = period.split(',');
+    return {
+        begin: new Date(dates[0]),
+        end: new Date(dates[1])
+    };
+};
+
 class TerraiAlertsRouter {
     static * getNational() {
         logger.info('Obtaining national data');
@@ -55,7 +79,12 @@ class TerraiAlertsRouter {
 
     static * wdpa() {
         logger.info('Obtaining wpda data with id %s', this.params.id);
-        let data = yield CartoDBService.getWdpa(this.params.id, this.query.alertQuery, this.query.period);
+        let period = this.query.period;
+        if(!period){
+            period = defaultDate();
+        }
+        let dates = getDates(period);
+        let data = yield ArcgisService.getAlertCountByWDPA(dates.begin, dates.end, this.params.id);
         this.body = TerraiAlertsSerializer.serialize(data);
     }
 
