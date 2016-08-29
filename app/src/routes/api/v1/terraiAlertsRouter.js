@@ -46,7 +46,7 @@ class TerraiAlertsRouter {
         let dates = getDates(period);
         let data = yield ArcgisService.getAlertCountByISO(dates.begin, dates.end, this.params.iso, this.query.gladConfirmOnly);
 
-        this.body = GladAlertsSerializer.serialize(data);
+        this.body = TerraiAlertsSerializer.serialize(data);
 
     }
 
@@ -58,7 +58,7 @@ class TerraiAlertsRouter {
         }
         let dates = getDates(period);
         let data = yield ArcgisService.getAlertCountByID1(dates.begin, dates.end, this.params.iso, this.params.id1, this.query.gladConfirmOnly);
-        this.body = GladAlertsSerializer.serialize(data);
+        this.body = TerraiAlertsSerializer.serialize(data);
     }
 
     static * use() {
@@ -89,7 +89,7 @@ class TerraiAlertsRouter {
             this.throw(404, 'Name not found');
         }
         let data = yield ArcgisService.getAlertCountByUSE(dates.begin, dates.end, useTable, this.params.id, this.query.gladConfirmOnly);
-        this.body = GladAlertsSerializer.serialize(data);
+        this.body = TerraiAlertsSerializer.serialize(data);
 
     }
 
@@ -101,7 +101,7 @@ class TerraiAlertsRouter {
         }
         let dates = getDates(period);
         let data = yield ArcgisService.getAlertCountByWDPA(dates.begin, dates.end, this.params.id, this.query.gladConfirmOnly);
-        this.body = GladAlertsSerializer.serialize(data);
+        this.body = TerraiAlertsSerializer.serialize(data);
     }
 
     static * world() {
@@ -115,7 +115,7 @@ class TerraiAlertsRouter {
             let dates = getDates(period);
             let data = yield ArcgisService.getAlertCountByGeostore(dates.begin, dates.end, this.query.geostore, this.query.gladConfirmOnly);
 
-            this.body = GladAlertsSerializer.serialize(data);
+            this.body = TerraiAlertsSerializer.serialize(data);
         } catch (err) {
             if (err instanceof NotFound) {
                 this.throw(404, 'Geostore not found');
@@ -129,7 +129,7 @@ class TerraiAlertsRouter {
     static * latest() {
         logger.info('Obtaining latest data');
         let data = yield ArcgisService.getFullHistogram(this.query.limit);
-        this.body = GladAlertsSerializer.serializeLatest(data);
+        this.body = TerraiAlertsSerializer.serializeLatest(data);
     }
 
 }
