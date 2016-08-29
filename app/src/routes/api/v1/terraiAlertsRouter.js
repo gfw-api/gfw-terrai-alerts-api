@@ -39,19 +39,35 @@ let getDates = function(period) {
 class TerraiAlertsRouter {
     static * getNational() {
         logger.info('Obtaining national data');
-        let data = yield CartoDBService.getNational(this.params.iso, this.query.alertQuery, this.query.period);
+        let period = this.query.period;
+        if(!period){
+            period = defaultDate();
+        }
+        let dates = getDates(period);
+        let data = yield ArcgisService.getAlertCountByISO(dates.begin, dates.end, this.params.iso, this.query.gladConfirmOnly);
 
-        this.body = TerraiAlertsSerializer.serialize(data);
+        this.body = GladAlertsSerializer.serialize(data);
+
     }
 
     static * getSubnational() {
         logger.info('Obtaining subnational data');
-        let data = yield CartoDBService.getSubnational(this.params.iso, this.params.id1, this.query.alertQuery, this.query.period);
-        this.body = TerraiAlertsSerializer.serialize(data);
+        let period = this.query.period;
+        if(!period){
+            period = defaultDate();
+        }
+        let dates = getDates(period);
+        let data = yield ArcgisService.getAlertCountByID1(dates.begin, dates.end, this.params.iso, this.params.id1, this.query.gladConfirmOnly);
+        this.body = GladAlertsSerializer.serialize(data);
     }
 
     static * use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
+        let period = this.query.period;
+        if(!period){
+            period = defaultDate();
+        }
+        let dates = getDates(period);
         let useTable = null;
         switch (this.params.name) {
             case 'mining':
@@ -72,8 +88,8 @@ class TerraiAlertsRouter {
         if (!useTable) {
             this.throw(404, 'Name not found');
         }
-        let data = yield CartoDBService.getUse(useTable, this.params.id, this.query.alertQuery, this.query.period);
-        this.body = TerraiAlertsSerializer.serialize(data);
+        let data = yield ArcgisService.getAlertCountByUSE(dates.begin, dates.end, useTable, this.params.id, this.query.gladConfirmOnly);
+        this.body = GladAlertsSerializer.serialize(data);
 
     }
 
@@ -84,19 +100,24 @@ class TerraiAlertsRouter {
             period = defaultDate();
         }
         let dates = getDates(period);
-        let data = yield ArcgisService.getAlertCountByWDPA(dates.begin, dates.end, this.params.id);
-        this.body = TerraiAlertsSerializer.serialize(data);
+        let data = yield ArcgisService.getAlertCountByWDPA(dates.begin, dates.end, this.params.id, this.query.gladConfirmOnly);
+        this.body = GladAlertsSerializer.serialize(data);
     }
 
     static * world() {
         logger.info('Obtaining world data');
         this.assert(this.query.geostore, 400, 'GeoJSON param required');
-        try{
-            let data = yield CartoDBService.getWorld(this.query.geostore, this.query.alertQuery, this.query.period);
+        try {
+            let period = this.query.period;
+            if(!period){
+                period = defaultDate();
+            }
+            let dates = getDates(period);
+            let data = yield ArcgisService.getAlertCountByGeostore(dates.begin, dates.end, this.query.geostore, this.query.gladConfirmOnly);
 
-            this.body = TerraiAlertsSerializer.serialize(data);
-        } catch(err){
-            if(err instanceof NotFound){
+            this.body = GladAlertsSerializer.serialize(data);
+        } catch (err) {
+            if (err instanceof NotFound) {
                 this.throw(404, 'Geostore not found');
                 return;
             }
@@ -107,8 +128,8 @@ class TerraiAlertsRouter {
 
     static * latest() {
         logger.info('Obtaining latest data');
-        let data = yield ArcgisService.getFullHistogram();
-        this.body = TerraiAlertsSerializer.serializeLatest(data);
+        let data = yield ArcgisService.getFullHistogram(this.query.limit);
+        this.body = GladAlertsSerializer.serializeLatest(data);
     }
 
 }
