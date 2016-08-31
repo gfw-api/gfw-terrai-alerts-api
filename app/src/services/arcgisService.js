@@ -151,7 +151,7 @@ class ArcgisService {
         logger.debug('Obtaining max date from histograms');
         let year = START_YEAR + Math.floor((counts.length -1) / 23);
         let beginDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
-        let daysFromStartYear = ((counts.length - 1) % 23) * 16;
+        let daysFromStartYear = ((counts.length - 2) % 23) * 16; // -2 because not consider 0 and size return +1
         let date = new Date(beginDate.getTime() + ((daysFromStartYear -1 ) * 24 * 60 * 60 * 1000));
         return date;
     }
