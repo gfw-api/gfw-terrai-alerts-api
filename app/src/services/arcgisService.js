@@ -87,12 +87,15 @@ class ArcgisService {
     }
 
     static datesToGridCodes(begin, end) {
-        let beginDate = new Date(Date.UTC(START_YEAR, 0, 1, 0, 0, 0));
+        let beginDay = ArcgisService.getYearDay(begin);
+        let indexBegin =  ((begin.getFullYear()  - START_YEAR) * 23) + (Math.floor(beginDay / 16));
 
+        let endDay = ArcgisService.getYearDay(end);
+        let indexEnd =  ((end.getFullYear()  - START_YEAR) * 23) + (Math.floor(endDay / 16) );
 
         let indexes = [];
-        indexes[0] = Math.ceil((begin.getTime() - beginDate.getTime()) / ((24* 60*60*1000) * 16)) + 1;
-        indexes[1] = Math.floor(( end.getTime() - beginDate.getTime()) / ((24* 60*60*1000) * 16)) + 1;
+        indexes[0] = indexBegin + 1; // +1 for not consider the 0 position in array of arcgis
+        indexes[1] = indexEnd + 1;
 
         return indexes;
     }
@@ -146,19 +149,23 @@ class ArcgisService {
 
     static getMaxDateFromHistograms(counts) {
         logger.debug('Obtaining max date from histograms');
-        let beginDate = new Date(Date.UTC(START_YEAR, 0, 1, 0, 0, 0));
-        let daysFromStartYear = (counts.length - 1) * 16;
+        let year = START_YEAR + Math.floor((counts.length -1) / 23);
+        let beginDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
+        let daysFromStartYear = ((counts.length - 1) % 23) * 16;
         let date = new Date(beginDate.getTime() + ((daysFromStartYear -1 ) * 24 * 60 * 60 * 1000));
         return date;
     }
 
     static formatCountsLatest(counts) {
         let results = {};
-        let year = null;
+        let year = START_YEAR;
+        let oldYear = null;
         let newValue = new Date(Date.UTC(START_YEAR, 0, 1));
         for (let i = 1, length = counts.length; i < length; i++) {
 
-            if(i > 1){
+            if(!year || year !== oldYear){
+                let newValue = new Date(Date.UTC(year, 0, 1));
+            } else {
                 newValue = new Date(newValue.getTime() + 24*60*60*1000);
             }
             year = newValue.getFullYear();
@@ -166,9 +173,13 @@ class ArcgisService {
                 results[year] = [];
             }
             results[year].push(counts[i]);
+            oldYear = year;
             for(let j = 0; j < 15; j++){
                 newValue = new Date(newValue.getTime() + 24*60*60*1000);
                 year = newValue.getFullYear();
+                if(year !== oldYear){
+                    break;
+                }
                 if(!results[year]){
                     results[year] = [];
                 }
