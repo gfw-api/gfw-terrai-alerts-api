@@ -1,10 +1,11 @@
 prod:
-  image: vizzuality/gfw-terrai-alerts-api:2.0.0${STAGING}
+  image: vizzuality/gfw-terrai-alerts-api:2.1.0${STAGING}
   ports:
     - "3600"
   env_file:
     - prod.env
   command: start
+  dns: ${DNS_SERVER}
   log_driver: "gelf"
   restart: always
   log_opt:

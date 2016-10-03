@@ -224,8 +224,8 @@ class ArcgisService {
         };
     }
 
-    static generateQuery(iso, id1, dateYearBegin, yearBegin, dateYearEnd, yearEnd, confirmed) {
-            let query = `select sum(count) as value from table where country_id='${iso}' ${id1 ? ` and state_id = '${id1}' `: ''} ${confirmed ? ' and confidence like \'confirmed\' ' : ''}`;
+    static generateQuery(iso, id1, dateYearBegin, yearBegin, dateYearEnd, yearEnd) {
+            let query = `select sum(count) as value from table where country_id='${iso}' ${id1 ? ` and state_id = '${id1}' `: ''}`;
         if(yearBegin === yearEnd){
             query += ` and year like '${yearBegin}' and day::int >= ${dateYearBegin} and day::int <= ${dateYearEnd}`;
         } else {
@@ -249,17 +249,17 @@ class ArcgisService {
         return query;
     }
 
-    static * getAlertCountByJSON(begin, end, iso, id1, confirmedOnly ){
+    static * getAlertCountByJSON(begin, end, iso, id1 ){
         logger.debug('Obtaining count with iso %s and id1 %s', iso, id1);
         let dateYearBegin = ArcgisService.getYearDay(begin);
         let yearBegin = begin.getFullYear();
         let dateYearEnd = ArcgisService.getYearDay(end);
         let yearEnd = end.getFullYear();
 
-        let query = ArcgisService.generateQuery(iso, id1, dateYearBegin, yearBegin, dateYearEnd, yearEnd, confirmedOnly);
-        logger.info('Doing request to ', `/query/${config.get('dataset.idGlad')}?sql=${query}`);
+        let query = ArcgisService.generateQuery(iso, id1, dateYearBegin, yearBegin, dateYearEnd, yearEnd);
+        logger.info('Doing request to ', `/query/${config.get('dataset.idTerrai')}?sql=${query}`);
         let result = yield require('vizz.microservice-client').requestToMicroservice({
-            uri: encodeURI(`/query/${config.get('dataset.idGlad')}?sql=${query}`),
+            uri: encodeURI(`/query/${config.get('dataset.idTerrai')}?sql=${query}`),
             method: 'GET',
             json: true
         });
