@@ -1,5 +1,8 @@
 {
     "cartoDB":{
         "user": "CARTODB_USER"
+    },
+    "dataset":{
+        "idTerrai": "DATASET_TERRAI_ID"
     }
 }
