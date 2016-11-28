@@ -1,7 +1,7 @@
 {
     "logger": {
         "name": "gfw-terrai-alerts-api",
-        "level": "info",
+        "level": "warn",
         "toFile": false,
         "dirLogFile": null
     }
