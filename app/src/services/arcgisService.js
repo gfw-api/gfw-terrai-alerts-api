@@ -225,7 +225,7 @@ class ArcgisService {
     }
 
     static generateQuery(iso, id1, dateYearBegin, yearBegin, dateYearEnd, yearEnd) {
-            let query = `select sum(count) as value from table where country_id='${iso}' ${id1 ? ` and state_id = '${id1}' `: ''}`;
+            let query = `select sum(count) as value from data where country_id='${iso}' ${id1 ? ` and state_id = '${id1}' `: ''}`;
         if(yearBegin === yearEnd){
             query += ` and year like '${yearBegin}' and day::int >= ${dateYearBegin} and day::int <= ${dateYearEnd}`;
         } else {

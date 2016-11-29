@@ -1,6 +1,6 @@
 {
   "name": "gfw-terrai-alerts-api",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "description": "Global forest watch - UMD Terrai Alerts API",
   "main": "index.js",
   "scripts": {

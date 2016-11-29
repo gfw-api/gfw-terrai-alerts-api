@@ -1,7 +1,7 @@
 {
     "logger": {
         "name": "gfw-terrai-alerts-api-STAGING",
-        "level": "debug",
+        "level": "info",
         "toFile": false,
         "dirLogFile": null
     },
