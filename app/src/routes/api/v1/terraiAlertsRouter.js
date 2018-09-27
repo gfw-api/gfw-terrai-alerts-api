@@ -82,6 +82,8 @@ class TerraiAlertsRouter {
             case 'logging':
                 useTable = 'gfw_logging';
                 break;
+            case 'birds':
+                useTable = 'endemic_bird_areas';
             default:
                 useTable = this.params.name;
         }
