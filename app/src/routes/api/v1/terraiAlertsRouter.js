@@ -83,7 +83,7 @@ class TerraiAlertsRouter {
                 useTable = 'gfw_logging';
                 break;
             default:
-                tableName = this.params.name;
+                useTable = this.params.name;
         }
         if (!useTable) {
             this.throw(404, 'Name not found');
